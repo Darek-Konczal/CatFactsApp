@@ -1,9 +1,10 @@
 using System.Text.Json;
 using CatFactsApp.Models;
+using CatFactsApp.Interfaces;
 
 namespace CatFactsApp.Services;
 
-public class CatFactService
+public class CatFactService : ICatFactService
 {
     private readonly HttpClient _httpClient;
 
@@ -14,7 +15,21 @@ public class CatFactService
 
     public async Task<CatFact?> GetFactAsync()
     {
-        var response = await _httpClient.GetAsync("https://catfact.ninja/fact");
+        HttpResponseMessage response;
+
+        try
+        {
+            response = await _httpClient.GetAsync("https://catfact.ninja/fact");
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return null;
+        }
 
         string content = await response.Content.ReadAsStringAsync();
 

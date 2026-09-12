@@ -1,6 +1,8 @@
+using CatFactsApp.Interfaces;
+
 namespace CatFactsApp.Services;
 
-public class FileService
+public class FileService : IFileService
 {
     public void SaveFact(string fact)
     {
