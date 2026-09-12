@@ -1,14 +1,20 @@
-﻿using System.Text.Json;
-using CatFactsApp.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using CatFactsApp.Services;
 
-using HttpClient client = new HttpClient();
+var services = new ServiceCollection();
 
-var response = await client.GetAsync("https://catfact.ninja/fact");
+services.AddSingleton<HttpClient>();
+services.AddSingleton<CatFactService>();
+services.AddSingleton<FileService>();
 
-string content = await response.Content.ReadAsStringAsync();
+var serviceProvider = services.BuildServiceProvider();
 
-CatFact? catFact = JsonSerializer.Deserialize<CatFact>(content);
+var service = serviceProvider.GetRequiredService<CatFactService>();
+var catFact = await service.GetFactAsync();
 
 Console.WriteLine($"Fact: {catFact?.Fact}");
 Console.WriteLine($"Length: {catFact?.Length}");
-File.AppendAllText("catfacts.txt", $"{catFact?.Fact}{Environment.NewLine}");
+
+var fileService = serviceProvider.GetRequiredService<FileService>();
+if (catFact != null)
+    fileService.SaveFact(catFact.Fact);
