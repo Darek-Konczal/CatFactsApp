@@ -1,10 +1,17 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using CatFactsApp.Services;
 using CatFactsApp.Interfaces;
+
+var configuration = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
 
 var services = new ServiceCollection();
 
 services.AddSingleton<HttpClient>();
+services.AddSingleton<IConfiguration>(configuration);
 services.AddSingleton<ICatFactService, CatFactService>();
 services.AddSingleton<IFileService, FileService>();
 
